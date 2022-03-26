@@ -383,12 +383,9 @@ private getSystemAuthID() {
         uri: "https://www.alarm.com/web/Default.aspx",
         body: loginString,
         requestContentType: "application/x-www-form-urlencoded",
-        headers : [
-            "Host" : "www.alarm.com",
-            "Content-Type" : "application/x-www-form-urlencoded",
-            "Connection" : "close",
-            "Cookie": "twoFactorAuthenticationId=${twoFactorAuthenticationId}"
-        ]
+        headers : getStandardHeaders([
+            "Content-Type" : "application/x-www-form-urlencoded"
+        ])
     ]
 
     try {
@@ -486,7 +483,7 @@ private getSystemStatus() {
     getSystemAuthID()
 
     // ensure we have a valid panelID
-    if (!state.panelID) {
+    if (!state.panelID || !state.twoFactorAuthenticationId) {
         getPanelID()
     }
 
@@ -698,7 +695,7 @@ private getStandardHeaders(options = []) {
         headers << options
     }
 
-    if (state.sessionID) {
+    if (state.sessionID && state.twoFactorAuthenticationId) {
         headers['Cookie'] = getCookieString()
     }
 
