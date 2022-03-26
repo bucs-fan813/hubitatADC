@@ -168,9 +168,6 @@ def mainPage() {
             input "password", "password", title: "Alarm.com Password", required: false
         }
         section {
-            input "twoFactorAuthenticationId", "twoFactorAuthenticationId", title: "twoFactorAuthenticationId from browser", required: false
-        }
-        section {
             input "pollEvery", "enum", title: "How often should the panel be polled for updates?", options: ["1 Minute", "5 Minutes", "10 Minutes", "15 Minutes", "30 Minutes", "60 Minutes", "3 Hours", "Never"], defaultValue: "30 Minutes", required: true
         }
         section {
@@ -364,6 +361,7 @@ private toggleOtherSwitchesTo(switchTypeExclude, switchState) {
 # Details: Two values of note are returned after a successful login
 # afg/ajaxrequestuniquekey (returned as a cookie and header)
 # ASP.NET_SessionId (returned as a cookie)
+# twoFactorAuthenticationId (returned as a cookie)
 ******************************************************************************/
 private getSystemAuthID() {
     debug("Getting refreshed authentication credentials", "getSystemAuthID()")
@@ -397,6 +395,7 @@ private getSystemAuthID() {
         httpPost(params) { resp ->
             def afg = null
             def sessionID = null
+            def twoFactorAuthenticationId = null
 
             // parse through the cookies to find the two authentication
             // values we need, store in state memory
@@ -407,17 +406,20 @@ private getSystemAuthID() {
                     afg = cookieObj.value
                 } else if (cookieObj.key == "ASP.NET_SessionId") {
                     sessionID = cookieObj.value
+                } else if (cookieObj.key == "twoFactorAuthenticationId") {
+                    twoFactorAuthenticationId = cookieObj.value
                 }
             }
 
-            debug("Received sessionID (${sessionID}) and afg (${afg})", "getSystemAuthID()")
+            debug("Received sessionID (${sessionID}), afg (${afg} and twoFactorAuthenticationId (${twoFactorAuthenticationId})", "getSystemAuthID()")
 
-            // store the ASP session ID and afg as state values
+            // store the ASP session ID, afg and twoFactorAuthenticationId state values
             state.sessionID = sessionID
             state.afg = afg
+            state.twoFactorAuthenticationId = twoFactorAuthenticationId
         }
     } catch (e) {
-        logError("Authentication Error: Username or password not accepted; Please update these values in the ADC settings", "getSystemAuthID()")
+        logError("Authentication Error: Username, password or twoFactorAuthenticationId not accepted; Please update these values in the ADC settings", "getSystemAuthID()")
     }
 }
 
@@ -710,7 +712,7 @@ private getStandardHeaders(options = []) {
 #
 ******************************************************************************/
 private getCookieString() {
-    return "ASP.NET_SessionId=${state.sessionID}; CookieTest=1; IsFromNewSite=1; afg=${state.afg};"
+    return "ASP.NET_SessionId=${state.sessionID}; CookieTest=1; IsFromNewSite=1; afg=${state.afg}; twoFactorAuthenticationId=${state.twoFactorAuthenticationId};"
 }
 
 /******************************************************************************
