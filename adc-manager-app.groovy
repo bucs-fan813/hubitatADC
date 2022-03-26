@@ -59,7 +59,8 @@ String appAuthor() { return "Jeff Pierce" }
     category: "Security",
     iconUrl: "https://images-na.ssl-images-amazon.com/images/I/71yQ11GAAiL.png",
     iconX2Url: "https://images-na.ssl-images-amazon.com/images/I/71yQ11GAAiL.png",
-    singleInstance: true
+    singleInstance: true,
+    importUrl: 'https://github.com/pierceography/hubitatADC/raw/master/adc-manager-app.groovy'
 )
 
 preferences {
