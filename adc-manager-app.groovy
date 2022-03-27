@@ -51,7 +51,7 @@ String appVersion() { return "1.1.2" }
 String appModified() { return "2020-05-31" }
 String appAuthor() { return "Jeff Pierce" }
 
- definition(
+definition(
     name: "Alarm.com Manager",
     namespace: "jmpierce",
     author: "Jeff Pierce",
@@ -76,7 +76,7 @@ def installed() {
         // app installed, acquire panelID
         getPanelID()
 
-        if (!state.afg || !state.sessionID) {
+        if (!state.afg || !state.sessionID || !state.twoFactorAuthenticationId) {
             logError("Authentication failed -- Unable to finish install!", "installed()")
             return
         }
@@ -108,7 +108,7 @@ def updated() {
         // app updated, re-acquire panelID
         getPanelID()
 
-        if (!state.afg || !state.sessionID) {
+        if (!state.afg || !state.sessionID || !state.twoFactorAuthenticationId) {
             logError("Authentication failed -- Unable to finish update!", "updated()")
             return
         }
